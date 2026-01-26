@@ -1,234 +1,225 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // For logout/navigation
-import './ProfilePage.css'; // Import CSS for styling
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import iceCreamIcon from '../assets/logo.png';
+import './ProfilePage.css';
 
-const ProfileSettings = () => {
-    const [user, setUser] = useState({
-        name: "Your Name",
-        email: "yourname@gmail.com",
-        phone: "", // Empty initially (e.g., "Add number")
-        role: "",
-        theme: "light",
-        language: "Eng",
-        avatar: "https://via.placeholder.com/80x80?text=User", // Placeholder avatar
-        notificationsAllowed: false, // Toggle for notifications
-    });
-    const [editing, setEditing] = useState(false); // Toggle edit mode for main panel
-    const [loading, setLoading] = useState(false);
-    const [showSettingsModal, setShowSettingsModal] = useState(false); // For settings dropdown
+const ProfilePage = () => {
+    const [user, setUser] = useState(null);
+    const [addresses, setAddresses] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [editing, setEditing] = useState(false);
+    const [editForm, setEditForm] = useState({ name: '', email: '' });
     const navigate = useNavigate();
 
-    // Fetch user data on mount (replace with real API call)
+    // Fetch user profile and addresses on mount
     useEffect(() => {
-        const fetchUser = async () => {
+        const fetchProfile = async () => {
             try {
                 setLoading(true);
+                setError(null);
                 const token = localStorage.getItem('token');
-                if (token) {
-                    const response = await fetch('http://localhost:4000/api/v1/profile', { // Assume endpoint for user profile
-                        headers: { 'Authorization': `Bearer ${token}` },
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        setUser(prev => ({ ...prev, ...data.user })); // Update with fetched data
+                if (!token) {
+                    setError('No authentication token found. Please log in.');
+                    navigate('/login');
+                    return;
+                }
+
+                // Fetch user profile - Use /profile endpoint
+                const userResponse = await fetch('http://localhost:4000/api/v1/user/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    credentials: 'include',
+                });
+
+                if (!userResponse.ok) {
+                    if (userResponse.status === 401) {
+                        localStorage.removeItem('token'); // Clear invalid token
+                        throw new Error('Session expired. Please log in again.');
+                    } else if (userResponse.status === 404) {
+                        throw new Error('Profile endpoint not found. Ensure backend has /api/v1/user/profile route.');
+                    } else {
+                        throw new Error(`HTTP error! Status: ${userResponse.status}`);
                     }
                 }
-            } catch (error) {
-                console.error("Error fetching user:", error);
+
+                const userData = await userResponse.json();
+                if (userData.success) {
+                    const userInfo = userData.user || userData.data || userData;
+                    setUser(userInfo);
+                    setEditForm({ name: userInfo.name || '', email: userInfo.email || '' });
+                } else {
+                    throw new Error(userData.message || 'Failed to fetch user profile');
+                }
+
+                // Fetch addresses (optional - skip if endpoint issues)
+                try {
+                    const addressResponse = await fetch('http://localhost:4000/api/v1/deliveries', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                        credentials: 'include',
+                    });
+
+                    if (addressResponse.ok) {
+                        const addressData = await addressResponse.json();
+                        if (addressData.success) {
+                            setAddresses(addressData.deliveries || []);
+                        }
+                    }
+                } catch (addrErr) {
+                    console.warn('Addresses fetch failed (non-critical):', addrErr);
+                    // Don't set error for addresses - keep profile functional
+                }
+            } catch (err) {
+                console.error('Profile fetch error:', err);
+                setError(err.message);
             } finally {
                 setLoading(false);
             }
         };
-        fetchUser();
-    }, []);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setUser(prev => ({ ...prev, [name]: value }));
+        fetchProfile();
+    }, [navigate]);
+
+    const handleEdit = () => {
+        if (user) {
+            setEditForm({ name: user.name || '', email: user.email || '' });
+        }
+        setEditing(true);
     };
 
-    const handleSaveChanges = async () => {
-        setLoading(true);
+    const handleSave = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:4000/api/v1/update-profile', { // Assume update endpoint
+            if (!token) throw new Error('No token found');
+
+            const response = await fetch('http://localhost:4000/api/v1/user/profile', { // ✅ Match GET endpoint
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify(user),
+                body: JSON.stringify(editForm),
+                credentials: 'include',
             });
 
-            const data = await response.json();
-            if (data.success) {
-                setEditing(false);
-                alert("Changes saved successfully!"); // Or use toast/popup
-            } else {
-                throw new Error(data.message || 'Update failed');
+            if (!response.ok) {
+                throw new Error(`Update failed: ${response.status}`);
             }
-        } catch (error) {
-            console.error("Update error:", error);
-            alert(`Error: ${error.message}`);
-        } finally {
-            setLoading(false);
+
+            const updatedData = await response.json();
+            const updatedUser = updatedData.user || updatedData.data || updatedData;
+            setUser(updatedUser);
+            setEditing(false);
+            alert('Profile updated successfully!');
+        } catch (err) {
+            console.error('Update error:', err);
+            alert(`Error: ${err.message}`);
         }
     };
 
     const handleLogout = () => {
         localStorage.removeItem('token');
-        navigate('/login');
+        localStorage.removeItem('role');
+        navigate('/');
     };
 
-    const toggleNotifications = () => {
-        setUser(prev => ({ ...prev, notificationsAllowed: !prev.notificationsAllowed }));
-    };
+    if (loading) {
+        return (
+            <div className="profile-loading">
+                <img src={iceCreamIcon} alt="Loading..." className="logo" />
+                <p>Loading your profile...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="profile-error">
+                <h2>{error}</h2>
+                <p>Check the browser console (F12) for more details.</p>
+                <button onClick={() => navigate('/login')}>Go to Login</button>
+                <button onClick={() => window.location.reload()}>Retry</button>
+            </div>
+        );
+    }
+
+    if (!user) {
+        return (
+            <div className="profile-error">
+                <h2>No profile data found</h2>
+                <button onClick={() => navigate('/login')}>Go to Login</button>
+            </div>
+        );
+    }
 
     return (
         <div className="profile-container">
-            {/* Left Sidebar */}
-            <div className="sidebar">
-                <div className="user-header">
-                    <img src={user.avatar} alt="User Avatar" className="avatar" />
-                    <div className="user-info">
-                        <h3>{user.name}</h3>
-                        <p>{user.email}</p>
-                    </div>
-                </div>
-
-                <nav className="nav-items">
-                    <button className="nav-item active" onClick={() => {}}>
-                        <span className="nav-icon">👤</span>
-                        My Profile
-                        <span className="nav-arrow">›</span>
-                    </button>
-                    <button className="nav-item" onClick={() => setShowSettingsModal(true)}>
-                        <span className="nav-icon">⚙️</span>
-                        Settings
-                        <span className="nav-arrow">›</span>
-                    </button>
-                    <button className="nav-item" onClick={toggleNotifications}>
-                        <span className="nav-icon">🔔</span>
-                        Notification
-                        <span className={`toggle ${user.notificationsAllowed ? 'active' : ''}`}>
-                            Allow
-                        </span>
-                    </button>
-                    <button className="nav-item logout" onClick={handleLogout}>
-                        <span className="nav-icon">↩️</span>
-                        Log out
-                    </button>
-                </nav>
+            <div className="profile-header">
+                <img src={iceCreamIcon} alt="FrozenFeast" className="logo" />
+                <h1>My Profile</h1>
             </div>
 
-            {/* Right Main Panel */}
-            <div className="main-panel">
-                <div className="panel-header">
-                    <h2>Your Name</h2>
-                    <button className="close-btn" onClick={() => navigate('/dashboard')}>×</button>
+            <div className="profile-content">
+                <div className="profile-section">
+                    <h2>Personal Information</h2>
+                    {editing ? (
+                        <div className="edit-form">
+                            <input
+                                type="text"
+                                placeholder="Full Name"
+                                value={editForm.name}
+                                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                            />
+                            <input
+                                type="email"
+                                placeholder="Email"
+                                value={editForm.email}
+                                onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                            />
+                            <div className="edit-buttons">
+                                <button onClick={handleSave}>Save Changes</button>
+                                <button onClick={() => setEditing(false)}>Cancel</button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="profile-info">
+                            <p><strong>Name:</strong> {user.name || 'N/A'}</p>
+                            <p><strong>Email:</strong> {user.email || 'N/A'}</p>
+                            {user.phone && <p><strong>Phone:</strong> {user.phone}</p>}
+                            <p><strong>Role:</strong> {user.role || 'Customer'}</p>
+                            <button onClick={handleEdit} className="edit-btn">Edit Profile</button>
+                        </div>
+                    )}
                 </div>
 
-                <div className="profile-details">
-                    <div className="detail-item">
-                        <label>Name</label>
-                        <input
-                            type="text"
-                            value={user.name}
-                            onChange={handleInputChange}
-                            name="name"
-                            disabled={!editing}
-                            placeholder="Your name"
-                        />
+                {addresses.length > 0 && (
+                    <div className="profile-section">
+                        <h2>Saved Addresses ({addresses.length})</h2>
+                        <div className="addresses-list">
+                            {addresses.map((address, index) => (
+                                <div key={address._id || index} className="address-item">
+                                    <p>{address.streetAdd}, {address.city}, {address.district}, {address.pin}</p>
+                                    {address.phone && <p className="address-phone">Phone: {address.phone}</p>}
+                                </div>
+                            ))}
+                        </div>
                     </div>
+                )}
 
-                    <div className="detail-item">
-                        <label>Email account</label>
-                        <input
-                            type="email"
-                            value={user.email}
-                            onChange={handleInputChange}
-                            name="email"
-                            disabled={!editing}
-                            placeholder="yourname@gmail.com"
-                        />
-                    </div>
-
-                    <div className="detail-item">
-                        <label>Mobile number</label>
-                        <input
-                            type="tel"
-                            value={user.phone}
-                            onChange={handleInputChange}
-                            name="phone"
-                            disabled={!editing}
-                            placeholder="Add number"
-                        />
-                    </div>
-
-                    <div className="detail-item">
-                        <label>Location</label>
-                        <select
-                            value={user.location}
-                            onChange={handleInputChange}
-                            name="location"
-                            disabled={!editing}
-                        >
-                            <option value="USA">USA</option>
-                            <option value="India">India</option>
-                            <option value="UK">UK</option>
-                            {/* Add more locations */}
-                        </select>
-                    </div>
+                <div className="profile-section">
+                    <h2>Account Actions</h2>
+                    <button onClick={handleLogout} className="logout-btn">Logout</button>
                 </div>
-
-                <button 
-                    className="save-btn" 
-                    onClick={handleSaveChanges} 
-                    disabled={!editing || loading}
-                >
-                    {loading ? "Saving..." : "Save Changes"}
-                </button>
             </div>
-
-            {/* Settings Modal (Bottom Sheet) */}
-            {showSettingsModal && (
-                <div className="settings-modal">
-                    <div className="modal-header">
-                        <h3>Settings</h3>
-                        <button className="close-btn" onClick={() => setShowSettingsModal(false)}>×</button>
-                    </div>
-                    <div className="modal-content">
-                        <div className="setting-item">
-                            <label>Theme</label>
-                            <select
-                                value={user.theme}
-                                onChange={handleInputChange}
-                                name="theme"
-                            >
-                                <option value="light">Light</option>
-                                <option value="dark">Dark</option>
-                            </select>
-                        </div>
-                        <div className="setting-item">
-                            <label>Language</label>
-                            <select
-                                value={user.language}
-                                onChange={handleInputChange}
-                                name="language"
-                            >
-                                <option value="Eng">Eng</option>
-                                <option value="Esp">Esp</option>
-                                <option value="Fr">Fr</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button className="save-btn" onClick={() => setShowSettingsModal(false)}>
-                        Save Changes
-                    </button>
-                </div>
-            )}
         </div>
     );
 };
 
-export default ProfileSettings;
+export default ProfilePage;

@@ -1,73 +1,186 @@
+/* Navbar wrapper for semantics and shadow */
+.navbar-header {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Subtle depth */
+}
+
 /* Navbar container */
-nav {
-  display: flex;
-  justify-content: space-between; /* left - center - right */
-  align-items: center;
-  padding: 12px 40px;
-  border-bottom: 2px solid #e01860; /* pink underline */
-  font-family: Arial, sans-serif;
-  background-color: white;
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 40px;
+    border-bottom: 2px solid #e01860; /* Pink underline */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; /* Modern font stack */
+    background-color: white;
+    position: relative; /* For mobile menu absolute positioning */
 }
 
-/* Logo + Name in one line */
-.image {
-  display: flex;
-   /* flex-direction: row;    */
-  align-items: center;
-  gap: 10px;             
+/* Logo section */
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.image img {
-  width: 40px;
-  height: 40px;
-  display: block;
+.logo-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
 }
 
-.image p {
-  margin: 0;
-  font-size: 22px;
-  font-weight: bold;
-  color: #ce3bcb; /* purple */
+.logo-link img {
+    width: 40px;
+    height: 40px;
+    display: block;
+    transition: transform 0.2s ease; /* Subtle scale on hover */
 }
 
-/* Menu section */
-.menu {
-  display: flex;
-  gap: 20px;
+.logo-link:hover img {
+    transform: scale(1.05);
 }
 
-.menu button {
-  background: none;
-  border: none;
-  font-size: 16px;
-  font-weight: 500;
-  color: #e01860;
-  cursor: pointer;
-  position: relative;
+.logo-link p {
+    margin: 0;
+    font-size: 22px;
+    font-weight: bold;
+    color: #d6006f; /* Purple */
 }
 
-.menu button:hover::after {
-  content: "";
-  position: absolute;
-  bottom: -6px;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background-color: #e01860;
-  border-radius: 2px;
+/* Menu section - Desktop */
+.menu-section {
+    display: flex;
+    gap: 30px; /* Increased gap for better spacing */
+    transition: all 0.3s ease; /* Smooth mobile slide-in */
+}
+
+.nav-item {
+    background: none;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
+    color: #e01860;
+    cursor: pointer;
+    position: relative;
+    text-decoration: none;
+    padding: 8px 0; /* Vertical padding for touch targets */
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-item:hover,
+.nav-item:focus-visible {
+    color: #ce3bcb; /* Purple on hover/focus */
+    transform: translateY(-1px); /* Subtle lift */
+}
+
+.nav-item.active {
+    color: #ce3bcb;
+    font-weight: bold;
+}
+
+.nav-item.active::after,
+.nav-item:hover::after {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #ce3bcb; /* Purple underline */
+    border-radius: 2px;
 }
 
 /* Icon section */
-.icon {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+.icons-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative; /* For hamburger absolute positioning */
 }
 
-.icon button {
-  background: none;
-  border: none;
-  font-size: 22px;
-  color: #e01860;
-  cursor: pointer;
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #e01860;
+    cursor: pointer;
+    padding: 8px; /* Touch-friendly */
+    border-radius: 50%; /* Circular hit area */
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.icon-btn:hover,
+.icon-btn:focus-visible {
+    background-color: #f8f9fa; /* Light gray bg on hover */
+    color: #ce3bcb;
+}
+
+/* Hamburger button (hidden on desktop) */
+.hamburger-btn {
+    display: none; /* Hide on desktop */
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #e01860;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: color 0.2s ease;
+}
+
+.hamburger-btn:hover {
+    color: #ce3bcb;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 12px 20px; /* Reduce side padding */
+    }
+
+    .menu-section {
+        position: absolute;
+        top: 100%; /* Below navbar */
+        left: 0;
+        right: 0;
+        background-color: white;
+        flex-direction: column;
+        gap: 0;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transform: translateY(-100%); /* Start hidden */
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .menu-section.mobile-open {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .nav-item {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0; /* Separator lines */
+    }
+
+    .hamburger-btn {
+        display: block; /* Show on mobile */
+    }
+
+    .icons-section {
+        gap: 10px;
+    }
+
+    .logo-section {
+        gap: 8px;
+    }
+
+    .logo-link p {
+        font-size: 18px; /* Smaller on mobile */
+    }
 }

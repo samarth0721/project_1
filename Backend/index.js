@@ -14,6 +14,13 @@ app.use(cors({ origin: 'http://localhost:3000' ,
 app.use(express.json());
 app.use(cookieParser());
 
+const userRoutes = require('./routes/user');
+app.use('/api/v1/user', userRoutes);
+
+// const passport = require('./middleware/passport');
+// app.use(passport.initialize());
+// app.use(passport.session()); // Optional for sessions
+
 app.use(
   fileUpload({
     useTempFiles: true,     

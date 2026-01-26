@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const User = require('../models/User');
 
+// Original exports (if used elsewhere)
 exports.auth = (req, res, next) => {
   try {
     let token = null;
@@ -21,7 +23,7 @@ exports.auth = (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    req.user = decoded; // Decoded token (lightweight, no DB fetch)
 
     next();
   } catch (error) {
@@ -52,3 +54,33 @@ exports.isCustomer = (req, res, next) => {
   }
   next();
 };
+
+// Enhanced async middleware (fetches full user from DB) - Use this for profile routes
+exports.authMiddleware = async (req, res, next) => {
+    try {
+        let token;
+        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            token = req.headers.authorization.split(' ')[1];
+        } else if (req.cookies.token) { // Fallback for cookies
+            token = req.cookies.token;
+        }
+
+        if (!token) {
+            return res.status(401).json({ success: false, message: 'No token provided' });
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id).select('-password -__v'); // Fetch full user, exclude sensitive fields
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'User not found' });
+        }
+
+        req.user = user; // Full user object
+        next();
+    } catch (error) {
+        console.error('Auth error:', error);
+        res.status(401).json({ success: false, message: 'Invalid token' });
+    }
+};
+
+//module.exports = authMiddleware; // Export the async middleware as default

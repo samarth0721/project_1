@@ -12,6 +12,7 @@ import Products from "./pages/Products";
 import LoginCard from "./Components/LoginCard";
 import SignUpCard from "./Components/SignUpCard";
 import Cart from "./pages/Cart";
+import ProfilePage from "./Components/ProfilePage";
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
@@ -30,6 +31,7 @@ function App() {
         <Route path="/login" element={<LoginCard/>}></Route>
         <Route path="/signup" element={<SignUpCard/>}></Route>
         <Route path="/cart" element={<Cart addedProducts={cartItems} setCartItems={setCartItems} />}></Route>
+        <Route path="/profile" element={<ProfilePage/>}></Route>
       </Routes>
     </div>
   );

@@ -1,5 +1,7 @@
 .product-container {
-  padding: 1rem;
+  padding: 20px;
+  text-align: center;
+  margin-top: 15px;
 }
 
 .available-products,
@@ -9,6 +11,7 @@
   justify-content: center;
   gap: 2rem;
   margin-bottom: 2rem;
+  margin-top: 30px;
 }
 
 .added-item {
@@ -21,6 +24,13 @@
 small {
   color: #666;
   margin-top: 0.5rem;
+}
+
+.banner {
+  background-color: #ec407a;
+  padding: 10px 30px;
+  display: inline-block;
+  clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
 }
 
 .modal-overlay {
@@ -47,8 +57,15 @@ small {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .floating-add-btn {
@@ -71,4 +88,56 @@ small {
 
 .floating-add-btn:hover {
   background: #d0006c;
+}
+
+.cart-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4caf50; /* Green success bg */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+}
+
+.cart-alert p {
+    margin: 0;
+    font-weight: 500;
+}
+
+.alert-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.alert-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
