@@ -141,3 +141,12 @@ small {
         opacity: 1;
     }
 }
+
+.product-card, .add-to-cart-btn {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover, .add-to-cart-btn:hover {
+    transform: translateY(-5px) scale(1.02); /* Lift + slight zoom */
+    box-shadow: 0 8px 20px rgba(224, 24, 96, 0.3); /* Pink glow */
+}

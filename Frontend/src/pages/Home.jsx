@@ -22,7 +22,7 @@ const Home = () => {
     return (
         <div>
             <div className="home-container">
-                <div className="home-text">
+                <div className="home-text fade-in">
                     <h1>Scoop into Happiness, Anytime, Anywhere!</h1>
                     <p>Welcome to the frozen feast, where the world of frozen delights comes alive! Get ready to embark on a mouthwatering journey through a virtual ice cream paradise. Whether you’re craving a cozy in-store treat, delivery to your doorstep, or a custom ice cream experience at your next event, we’re here to serve you the sweetest moments, wherever you are.</p>
                     <NavLink to="/products">

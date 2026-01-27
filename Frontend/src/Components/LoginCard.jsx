@@ -22,7 +22,7 @@ const LoginCard = () => {
             setTimeout(() => setShowPopup(false), 3000);
             return;
         }
-        
+
         setLoading(true);
         try {
             // Backend API call to login endpoint
@@ -32,7 +32,7 @@ const LoginCard = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ email, password }),
-                credentials:"include",
+                credentials: "include",
             });
 
             const responseData = await response.json();
@@ -40,9 +40,9 @@ const LoginCard = () => {
             if (response.ok && responseData.success) {
                 // Successful login - store token (assuming backend returns { success: true, token: '...' })
                 const token = responseData.token;
-                
-                    localStorage.setItem('token', token); // Persistent storage
-               
+
+                localStorage.setItem('token', token); // Persistent storage
+
 
                 setPopupMessage("✅ Logged in successfully!");
                 setShowPopup(true);
@@ -115,8 +115,15 @@ const LoginCard = () => {
                         <a href="#">Forgot your password?</a>
                     </div>
 
-                    <button type="submit" className="signin-btn" disabled={loading}>
-                        {loading ? "Signing in..." : "Sign in"}
+                    <button type="submit" disabled={loading}>
+                        {loading ? (
+                            <>
+                                <div className="spinner"></div>
+                                Signing in...
+                            </>
+                        ) : (
+                            'Sign in'
+                        )}
                     </button>
 
                     <p className="signup">

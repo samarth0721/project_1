@@ -109,12 +109,12 @@ button {
 }
 
 button[type="submit"] {
-    background-color: #ff69b4;
+    background-color: #d0006c;
     color: white;
 }
 
 button[type="button"] {
-    background-color: #ff69b4;
+    background-color: #d0006c;
     color: white;
     opacity: 0.8;
 }

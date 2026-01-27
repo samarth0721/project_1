@@ -86,7 +86,7 @@
 
 .add-to-cart-btn {
   width: 100%;
-  background-color: rgb(195, 44, 44);
+  background-color: #d0006c;
   color: white;
   border: none;
   border-radius: 0.75rem;
@@ -97,5 +97,5 @@
 }
 
 .add-to-cart-btn:hover {
-  background-color: rgb(165, 35, 35);
+  background-color: #a52323;
 }
