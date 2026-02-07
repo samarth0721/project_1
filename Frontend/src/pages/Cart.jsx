@@ -23,7 +23,7 @@ const Cart = ({ addedProducts = [], setCartItems }) => {
                     return;
                 }
 
-                const response = await fetch('http://localhost:4000/api/v1/deliveries', {
+                const response = await fetch('https://frozenfeast.onrender.com/api/v1/deliveries', {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
