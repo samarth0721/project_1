@@ -36,7 +36,7 @@ const Delivery = () => {
             }
 
             // Backend API call to delivery endpoint
-            const response = await fetch('http://localhost:4000/api/v1/user/delivery', {
+            const response = await fetch('https://frozenfeast.onrender.com/api/v1/user/delivery', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

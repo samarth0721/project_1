@@ -50,7 +50,7 @@ const AddProduct = () => {
             formData.append('price', productData.price);
             formData.append('imageFile', imageFile);
 
-            const response = await fetch('http://localhost:4000/api/v1/imageUpload', {
+            const response = await fetch('https://frozenfeast.onrender.com/api/v1/imageUpload', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

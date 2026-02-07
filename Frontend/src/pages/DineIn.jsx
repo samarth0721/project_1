@@ -13,7 +13,7 @@ const DineIn = () => {
             try {
                 setLoading(true);
                 setError(null); // Reset error on fetch
-                const response = await fetch('http://localhost:4000/api/v1/shop');
+                const response = await fetch('https://frozenfeast.onrender.com/api/v1/shop');
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
