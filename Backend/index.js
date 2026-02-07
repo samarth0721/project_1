@@ -7,9 +7,11 @@ require("dotenv").config();
 
 const PORT = process.env.PORT || 3000;
 const cors = require('cors');
-app.use(cors({ origin: "*" ,
-  credentials:true
-})); // Your frontend port
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
+ // Your frontend port
 
 app.use(express.json());
 app.use(cookieParser());
@@ -31,8 +33,8 @@ app.use(
 require("./config/database").connect();
 require("./config/cloudinary").connect();
 
-const user = require("./routes/user");
-app.use("/api/v1", user);
+// const user = require("./routes/user");
+// app.use("/api/v1", user);
 
 app.listen(PORT, () => {
   console.log(`server is running at port ${PORT}`);

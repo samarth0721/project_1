@@ -27,7 +27,7 @@ const LoginCard = () => {
         setLoading(true);
         try {
             // Backend API call to login endpoint
-            const response = await fetch(`${API_URL}/api/v1/login`, {
+            const response = await fetch(`${API_URL}/api/v1/user/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
