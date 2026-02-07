@@ -26,7 +26,7 @@ const LoginCard = () => {
         setLoading(true);
         try {
             // Backend API call to login endpoint
-            const response = await fetch('http://localhost:4000/api/v1/login', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
