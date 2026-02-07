@@ -11,6 +11,7 @@ const LoginCard = () => {
     const [loading, setLoading] = useState(false); // Added loading state
     const [showPopup, setShowPopup] = useState(false);
     const [popupMessage, setPopupMessage] = useState(""); // Dynamic message for success/error
+    const API_URL = process.env.REACT_APP_API_URL;
 
     const navigate = useNavigate(); // For redirection after login
 
@@ -26,7 +27,7 @@ const LoginCard = () => {
         setLoading(true);
         try {
             // Backend API call to login endpoint
-            const response = await fetch(`${import.meta.env.REACT_APP_API_URL}/api/v1/login`, {
+            const response = await fetch(`${API_URL}/api/v1/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
